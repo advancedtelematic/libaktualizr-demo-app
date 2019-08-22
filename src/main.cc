@@ -24,14 +24,24 @@ void check_info_options(const bpo::options_description &description, const bpo::
     std::cout << "Available commands: Shutdown, SendDeviceData, CheckUpdates, Download, Install, CampaignCheck\n";
     exit(EXIT_SUCCESS);
   }
+  if (vm.count("version") != 0) {
+    std::cout << "Current hmi_stub version is: " << aktualizr_version() << "\n";
+    exit(EXIT_SUCCESS);
+  }
 }
 
 bpo::variables_map parse_options(int argc, char *argv[]) {
   bpo::options_description description("HMI stub interface for libaktualizr");
+  // clang-format off
+  // Try to keep these options in the same order as Config::updateFromCommandLine().
+  // The first three are commandline only.
   description.add_options()
       ("help,h", "print usage")
+      ("version,v", "Current aktualizr version")
       ("config,c", bpo::value<std::vector<boost::filesystem::path> >()->composing(), "configuration file or directory")
+      ("secondary-configs-dir", bpo::value<boost::filesystem::path>(), "directory containing seconday ECU configuration files")
       ("loglevel", bpo::value<int>(), "set log level 0-5 (trace, debug, info, warning, error, fatal)");
+  // clang-format on
 
   bpo::variables_map vm;
   std::vector<std::string> unregistered_options;
@@ -118,6 +128,9 @@ int main(int argc, char *argv[]) {
 
   try {
     Config config(commandline_map);
+    if (config.logger.loglevel <= boost::log::trivial::debug) {
+      SSL_load_error_strings();
+    }
     LOG_DEBUG << "Current directory: " << boost::filesystem::current_path().string();
 
     Aktualizr aktualizr(config);
