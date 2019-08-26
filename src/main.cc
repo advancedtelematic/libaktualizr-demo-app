@@ -89,9 +89,11 @@ int main(int argc, char *argv[]) {
 
     aktualizr.Initialize();
 
+    const char *cmd_list = "Available commands: SendDeviceData, CheckUpdates, Download, Install, CampaignCheck, CampaignAccept, Pause, Resume, Abort";
+    std::cout << cmd_list << std::endl;
+
     std::vector<Uptane::Target> current_updates;
     std::string buffer;
-    LOG_INFO << "Available commands: SendDeviceData, CheckUpdates, Download, Install, CampaignCheck, CampaignAccept, Pause, Resume, Abort" << std::endl;
     while (std::getline(std::cin, buffer)) {
       std::vector<std::string> words;
       boost::algorithm::split(words, buffer, boost::is_any_of("\t "), boost::token_compress_on);
@@ -120,6 +122,7 @@ int main(int argc, char *argv[]) {
         aktualizr.Abort();
       } else if (!command.empty()) {
         std::cout << "Unknown command.\n";
+        std::cout << cmd_list << std::endl;
       }
     }
     return EXIT_SUCCESS;
