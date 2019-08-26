@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
       } else if (command == "campaigncheck") {
         aktualizr.CampaignCheck().get();
       } else if (command == "campaignaccept") {
-        aktualizr.CampaignControl(param, campaign::Cmd::Accept);
+        aktualizr.CampaignControl(param, campaign::Cmd::Accept).get();
       } else if (command == "pause") {
         aktualizr.Pause();
       } else if (command == "resume") {
