@@ -41,7 +41,7 @@ bpo::variables_map parse_options(int argc, char *argv[]) {
 void process_event(const std::shared_ptr<event::BaseEvent> &event) {
   static std::map<std::string, unsigned int> progress;
 
-  if (event->isTypeOf(event::DownloadProgressReport::TypeName)) {
+  if (event->isTypeOf<event::DownloadProgressReport>()) {
     const auto download_progress = dynamic_cast<event::DownloadProgressReport *>(event.get());
     if (progress.find(download_progress->target.sha256Hash()) == progress.end()) {
       progress[download_progress->target.sha256Hash()] = 0;
@@ -53,19 +53,19 @@ void process_event(const std::shared_ptr<event::BaseEvent> &event) {
       std::cout << "Download progress for file " << download_progress->target.filename() << ": " << new_progress
                 << "%\n";
     }
-  } else if (event->variant == "DownloadTargetComplete") {
+  } else if (event->isTypeOf<event::DownloadTargetComplete>()) {
     const auto download_complete = dynamic_cast<event::DownloadTargetComplete *>(event.get());
     std::cout << "Download complete for file " << download_complete->update.filename() << ": "
               << (download_complete->success ? "success" : "failure") << "\n";
     progress.erase(download_complete->update.sha256Hash());
-  } else if (event->variant == "InstallStarted") {
+  } else if (event->isTypeOf<event::InstallStarted>()) {
     const auto install_started = dynamic_cast<event::InstallStarted *>(event.get());
     std::cout << "Installation started for device " << install_started->serial.ToString() << "\n";
-  } else if (event->variant == "InstallTargetComplete") {
+  } else if (event->isTypeOf<event::InstallTargetComplete>()) {
     const auto install_complete = dynamic_cast<event::InstallTargetComplete *>(event.get());
     std::cout << "Installation complete for device " << install_complete->serial.ToString() << ": "
               << (install_complete->success ? "success" : "failure") << "\n";
-  } else if (event->variant == "UpdateCheckComplete") {
+  } else if (event->isTypeOf<event::UpdateCheckComplete>()) {
     const auto check_complete = dynamic_cast<event::UpdateCheckComplete *>(event.get());
     std::cout << check_complete->result.updates.size() << " updates available\n";
   } else {
