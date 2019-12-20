@@ -45,3 +45,9 @@ Aktualizr uses Boost's [Signals2 library](https://www.boost.org/doc/html/signals
 ### main
 
 In main, all that is left to do is create our aktualizr object, initialize it using the config file specified, and then listen for commands on stdin.
+
+## License
+
+This code is licensed under the [Mozilla Public License 2.0](LICENSE), a copy of which can be found in this repository. All code is copyright HERE Europe B.V., 2019.
+
+We require that contributors accept the terms of Linux Foundation's [Developer Certificate of Origin](https://developercertificate.org/). Please see the [contribution instructions of aktualizr](https://github.com/advancedtelematic/aktualizr/blob/master/CONTRIBUTING.md) for more information.
