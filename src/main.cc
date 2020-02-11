@@ -97,8 +97,7 @@ int main(int argc, char *argv[]) {
     while (std::getline(std::cin, buffer)) {
       std::vector<std::string> words;
       boost::algorithm::split(words, buffer, boost::is_any_of("\t "), boost::token_compress_on);
-      std::string &command = words[0];
-      std::string &param = words[1];
+      std::string &command = words.at(0);
       boost::algorithm::to_lower(command);
       if (command == "senddevicedata") {
         aktualizr.SendDeviceData().get();
@@ -113,7 +112,11 @@ int main(int argc, char *argv[]) {
       } else if (command == "campaigncheck") {
         aktualizr.CampaignCheck().get();
       } else if (command == "campaignaccept") {
-        aktualizr.CampaignControl(param, campaign::Cmd::Accept).get();
+        if (words.size() == 2) {
+          aktualizr.CampaignControl(words.at(1), campaign::Cmd::Accept).get();
+        } else {
+          std::cout << "Error. Specify the campaign ID" << std::endl;
+        }
       } else if (command == "pause") {
         aktualizr.Pause();
       } else if (command == "resume") {
