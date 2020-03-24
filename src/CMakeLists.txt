@@ -8,6 +8,6 @@ set(SOURCES main.cc)
 add_executable(${TARGET_NAME} ${SOURCES})
 
 add_definitions(-DBOOST_LOG_DYN_LINK)
-target_link_libraries(${TARGET_NAME} aktualizr_static_lib ${AKTUALIZR_EXTERNAL_LIBS})
+target_link_libraries(${TARGET_NAME} aktualizr_lib)
 
 install(TARGETS ${TARGET_NAME} DESTINATION bin)
