@@ -58,7 +58,7 @@ void process_event(const std::shared_ptr<event::BaseEvent> &event) {
   } else if (event->isTypeOf<event::DownloadTargetComplete>()) {
     const auto download_complete = dynamic_cast<event::DownloadTargetComplete *>(event.get());
     std::cout << "Download complete for file " << download_complete->update.filename() << ": "
-              << (download_complete->success ? "success" : "failure") << "\n";
+              << (download_complete->success ? "success" : "failure") << "\n";  // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
     progress.erase(download_complete->update.sha256Hash());
   } else if (event->isTypeOf<event::InstallStarted>()) {
     const auto install_started = dynamic_cast<event::InstallStarted *>(event.get());
@@ -66,7 +66,7 @@ void process_event(const std::shared_ptr<event::BaseEvent> &event) {
   } else if (event->isTypeOf<event::InstallTargetComplete>()) {
     const auto install_complete = dynamic_cast<event::InstallTargetComplete *>(event.get());
     std::cout << "Installation complete for device " << install_complete->serial.ToString() << ": "
-              << (install_complete->success ? "success" : "failure") << "\n";
+              << (install_complete->success ? "success" : "failure") << "\n";  // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
   } else if (event->isTypeOf<event::UpdateCheckComplete>()) {
     const auto check_complete = dynamic_cast<event::UpdateCheckComplete *>(event.get());
     std::cout << check_complete->result.updates.size() << " updates available\n";
@@ -75,7 +75,7 @@ void process_event(const std::shared_ptr<event::BaseEvent> &event) {
   }
 }
 
-void initSecondaries(Aktualizr& aktualizr, const boost::filesystem::path& config_file) {
+void initSecondaries(Aktualizr *aktualizr, const boost::filesystem::path& config_file) {
   if (!boost::filesystem::exists(config_file)) {
     throw std::invalid_argument("Specified config file doesn't exist: " + config_file.string());
   }
@@ -95,7 +95,7 @@ void initSecondaries(Aktualizr& aktualizr, const boost::filesystem::path& config
       for (const auto& c: *it) {
         Primary::VirtualSecondaryConfig sec_cfg(c);
         auto sec = std::make_shared<Primary::VirtualSecondary>(sec_cfg);
-        aktualizr.AddSecondary(sec);
+        aktualizr->AddSecondary(sec);
       }
     } else {
       LOG_ERROR << "Unsupported type of Secondary: " << secondary_type << std::endl;
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
 
     if (!config.uptane.secondary_config_file.empty()) {
       try {
-        initSecondaries(aktualizr, config.uptane.secondary_config_file);
+        initSecondaries(&aktualizr, config.uptane.secondary_config_file);
       } catch (const std::exception &e) {
         LOG_ERROR << "Failed to init Secondaries: " << e.what();
         LOG_ERROR << "Exiting...";
