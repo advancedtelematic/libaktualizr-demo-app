@@ -1,5 +1,7 @@
 # libaktualizr-demo-app
 
+![](https://github.com/advancedtelematic/libaktualizr-demo-app/workflows/.github/workflows/main.yml/badge.svg)
+
 This is a sample application for integrating libaktualizr. The application is intented to be built as a part of a yocto build. The corresponding yocto layer can be found at <https://github.com/advancedtelematic/meta-libaktualizr-demo>.
 This project uses git submodules. You should either clone it with `--recurse-submodules` flag or run `git submodule update --init --recursive` later.
 
