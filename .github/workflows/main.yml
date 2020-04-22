@@ -1,0 +1,28 @@
+name: libaktualizr-demo-app CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - run: cd aktualizr && git fetch --prune --unshallow  # aktualizr/scripts/get_version.sh fails otherwise
+      - name: Install dependencies
+        run: >
+          sudo apt update && sudo apt install asn1c clang-format-6.0 clang-tidy-6.0 libarchive-dev libboost-dev
+          libboost-filesystem-dev libboost-log-dev libboost-program-options-dev
+          libcurl4-openssl-dev libpthread-stubs0-dev libsodium-dev
+          libsqlite3-dev libssl-dev ninja-build
+      - name: Cmake
+        run: mkdir build && cd build && cmake -GNinja -DRUN_CHECKS=yes ..
+      - name: Compile
+        run: cd build && ninja

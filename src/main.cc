@@ -13,6 +13,8 @@
 #include "primary/aktualizr.h"
 #include "utilities/utils.h"
 
+#include "virtualsecondary.h"
+
 namespace bpo = boost::program_options;
 
 bpo::variables_map parse_options(int argc, char *argv[]) {
@@ -20,7 +22,7 @@ bpo::variables_map parse_options(int argc, char *argv[]) {
   description.add_options()
       ("config,c", bpo::value<std::vector<boost::filesystem::path> >()->composing(), "configuration file or directory")
       ("help,h", "print help message")
-      ("secondary-configs-dir", bpo::value<boost::filesystem::path>(), "directory containing seconday ECU configuration files")
+      ("secondary-configs-dir", bpo::value<boost::filesystem::path>(), "directory containing Secondary ECU configuration files")
       ("loglevel", bpo::value<int>(), "set log level 0-5 (trace, debug, info, warning, error, fatal)");
 
   bpo::variables_map vm;
@@ -56,7 +58,7 @@ void process_event(const std::shared_ptr<event::BaseEvent> &event) {
   } else if (event->isTypeOf<event::DownloadTargetComplete>()) {
     const auto download_complete = dynamic_cast<event::DownloadTargetComplete *>(event.get());
     std::cout << "Download complete for file " << download_complete->update.filename() << ": "
-              << (download_complete->success ? "success" : "failure") << "\n";
+              << (download_complete->success ? "success" : "failure") << "\n";  // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
     progress.erase(download_complete->update.sha256Hash());
   } else if (event->isTypeOf<event::InstallStarted>()) {
     const auto install_started = dynamic_cast<event::InstallStarted *>(event.get());
@@ -64,12 +66,40 @@ void process_event(const std::shared_ptr<event::BaseEvent> &event) {
   } else if (event->isTypeOf<event::InstallTargetComplete>()) {
     const auto install_complete = dynamic_cast<event::InstallTargetComplete *>(event.get());
     std::cout << "Installation complete for device " << install_complete->serial.ToString() << ": "
-              << (install_complete->success ? "success" : "failure") << "\n";
+              << (install_complete->success ? "success" : "failure") << "\n";  // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay, hicpp-no-array-decay)
   } else if (event->isTypeOf<event::UpdateCheckComplete>()) {
     const auto check_complete = dynamic_cast<event::UpdateCheckComplete *>(event.get());
     std::cout << check_complete->result.updates.size() << " updates available\n";
   } else {
     std::cout << "Received " << event->variant << " event\n";
+  }
+}
+
+void initSecondaries(Aktualizr *aktualizr, const boost::filesystem::path& config_file) {
+  if (!boost::filesystem::exists(config_file)) {
+    throw std::invalid_argument("Specified config file doesn't exist: " + config_file.string());
+  }
+
+  std::ifstream json_file_stream(config_file.string());
+  Json::Value config;
+  std::string errs;
+
+  if (!Json::parseFromStream(Json::CharReaderBuilder(), json_file_stream, &config, &errs)) {
+    throw std::invalid_argument("Failed to parse Secondary config file " + config_file.string() + ": " + errs);
+  }
+
+  for (auto it = config.begin(); it != config.end(); ++it) {
+    std::string secondary_type = it.key().asString();
+
+    if (secondary_type == Primary::VirtualSecondaryConfig::Type) {
+      for (const auto& c: *it) {
+        Primary::VirtualSecondaryConfig sec_cfg(c);
+        auto sec = std::make_shared<Primary::VirtualSecondary>(sec_cfg);
+        aktualizr->AddSecondary(sec);
+      }
+    } else {
+      LOG_ERROR << "Unsupported type of Secondary: " << secondary_type << std::endl;
+    }
   }
 }
 
@@ -86,6 +116,16 @@ int main(int argc, char *argv[]) {
 
     auto f_cb = [](const std::shared_ptr<event::BaseEvent> event) { process_event(event); };
     boost::signals2::scoped_connection conn(aktualizr.SetSignalHandler(f_cb));
+
+    if (!config.uptane.secondary_config_file.empty()) {
+      try {
+        initSecondaries(&aktualizr, config.uptane.secondary_config_file);
+      } catch (const std::exception &e) {
+        LOG_ERROR << "Failed to init Secondaries: " << e.what();
+        LOG_ERROR << "Exiting...";
+        return EXIT_FAILURE;
+      }
+    }
 
     aktualizr.Initialize();
 
