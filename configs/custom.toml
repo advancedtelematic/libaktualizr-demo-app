@@ -1,0 +1,17 @@
+[provision]
+provision_path = "credentials.zip"
+mode = "SharedCredReuse"
+primary_ecu_hardware_id = "demo-device"
+
+[uptane]
+secondary_config_file = "secondary.json"
+
+[logger]
+loglevel = 1
+
+[storage]
+path = "storage"
+
+[pacman]
+type = "pacman-example"
+images_path = "images"
