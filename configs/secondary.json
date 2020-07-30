@@ -1,0 +1,12 @@
+{
+  "custom": [
+    {
+      "ecu_hardware_id": "custom-secondary",
+      "full_client_dir": "storage/sec1",
+      "ecu_private_key": "sec.private",
+      "ecu_public_key": "sec.public",
+      "target_name_path": "storage/sec1/target_name",
+      "metadata_path": "storage/sec1/metadata"
+    }
+  ]
+}

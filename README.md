@@ -11,7 +11,7 @@ mkdir build && cd build
 cmake ..
 make libaktualizr-demo-app
 cp /path/to/credentials.zip ./credentials.zip
-src/libaktualizr-demo-app -c ../aktualizr/config/sota-local.toml
+src/libaktualizr-demo-app -c ../configs/simple.toml
 ```
 
 ## What does this do?
@@ -47,6 +47,13 @@ Aktualizr uses Boost's [Signals2 library](https://www.boost.org/doc/html/signals
 ### main
 
 In main, all that is left to do is create our aktualizr object, initialize it using the config file specified, and then listen for commands on stdin.
+
+## Custom Package Manager and custom Secondary type
+
+This demo application also includes a minimal working example implementations for a custom Package Manager and for a custom Secondary type, which can be found respectively in `src/custom-pacman.cc` and `src/custom-secondary.[cc|h]`.
+Using customized implementations allow users to more flexibly control their installation process, versioning, and error reporting.
+To try the custom Package Manager and Secondary implementations run libaktualizr-demo-app with config/custom.toml config file. Note that path to the Secondary config specified in the `uptane.secondary_config_file` parameter is relative to the current working directory.
+
 
 ## License
 

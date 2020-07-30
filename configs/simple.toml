@@ -1,0 +1,14 @@
+[provision]
+provision_path = "credentials.zip"
+mode = "SharedCredReuse"
+primary_ecu_hardware_id = "demo-device"
+
+[logger]
+loglevel = 1
+
+[storage]
+path = "storage"
+
+[pacman]
+type = "none"
+images_path = "images"
