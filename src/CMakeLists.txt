@@ -3,7 +3,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(TARGET_NAME libaktualizr-demo-app)
 
-set(SOURCES main.cc)
+set(SOURCES main.cc custom-secondary.cc)
 
 find_program(CLANG_TIDY_BIN "clang-tidy-6.0")
 
