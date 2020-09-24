@@ -1,8 +1,10 @@
 #include <memory>
 #include <string>
 
-#include "package_manager/packagemanagerfactory.h"
-#include "package_manager/packagemanagerinterface.h"
+#include "libaktualizr/packagemanagerfactory.h"
+#include "libaktualizr/packagemanagerinterface.h"
+
+#include "storage/invstorage.h"
 
 #define CUSTOM_PACKAGE_MANAGER_NAME "pacman-example"
 

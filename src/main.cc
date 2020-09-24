@@ -9,8 +9,9 @@
 #include <boost/signals2.hpp>
 
 #include "libaktualizr/config.h"
+#include "libaktualizr/aktualizr.h"
+
 #include "logging/logging.h"
-#include "primary/aktualizr.h"
 #include "utilities/utils.h"
 
 #include "custom-secondary.h"
